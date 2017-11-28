@@ -2,12 +2,20 @@ var Twitter = require('twitter');
 var keys = require('./keys.js');
 var Spotify = require('node-spotify-api');
 var request = require('request');
+var fs = require('fs');
 
 
 var myTitle;
 var myCommand = process.argv[2] ;
 var secondArg = process.argv.slice(3);
 myTitle = secondArg.join(" ");
+
+var doIt = function () {
+	fs.readFile('random.txt', "utf8", function(error, data){
+    var txt = data.split(',');
+    spotIt(txt[1]);
+  });
+}; //end of doIt function
 
 var movieIt = function () {
 	
@@ -96,6 +104,7 @@ var tweeted = function() {
 
 }; //end of tweeted function
 
+
 switch (myCommand) {
 
 	case "my-tweets":
@@ -108,6 +117,10 @@ switch (myCommand) {
 
 	case "movie-this":
 	movieIt();
+	break;
+
+	case "do-what-it-says":
+	doIt();
 	break;
 
 	default:
