@@ -4,16 +4,36 @@ var Spotify = require('node-spotify-api');
 var request = require('request');
 var fs = require('fs');
 
-
 var myTitle;
 var myCommand = process.argv[2] ;
 var secondArg = process.argv.slice(3);
 myTitle = secondArg.join(" ");
 
 var doIt = function () {
+	
 	fs.readFile('random.txt', "utf8", function(error, data){
-    var txt = data.split(',');
-    spotIt(txt[1]);
+
+    var newCommand = data.split(',');
+
+	switch (newCommand[0]) {
+
+		case "my-tweets":
+		tweeted();
+		break;
+
+		case "spotify-this-song":
+		myTitle = newCommand[1];
+		spotIt();
+		break;
+
+		case "movie-this":
+		myTitle = newCommand[1];
+		movieIt();
+		break;
+
+		default:
+		console.log("Something is wrong with the file random.txt, fix it.");
+	};
   });
 }; //end of doIt function
 
@@ -47,43 +67,45 @@ var movieIt = function () {
 
 var spotIt = function() {
 
-		var songInfo;
+	var songInfo;
 
-		var spotify = new Spotify({
-		  id: '991b07ffce27421abd7c8f03f607cfea',
-		  secret: 'e53baadb4e3c422dae82a55af31b3072'
-		});
+	var spotify = new Spotify({
+	  id: '991b07ffce27421abd7c8f03f607cfea',
+	  secret: 'e53baadb4e3c422dae82a55af31b3072'
+	});
 
-		if (!myTitle) {
-			myTitle = 'The Sign';
-		}
+	if (!myTitle) {
+		myTitle = 'The Sign';
+	}
 
-		spotify.search({ type: 'track', query: myTitle }, function(err, data) {
-		  if (err) {
-		    return console.log('Error occurred: ' + err);
-		  }
-		 songInfo = data.tracks.items[0]; 
+	spotify.search({ type: 'track', query: myTitle }, function(err, data) {
+	  if (err) {
+	    return console.log('Error occurred: ' + err);
+	  }
 
-		 		console.log("\n-------------- Your Song Info ---------------------\n")
+	songInfo = data.tracks.items[0]; 
 
-		  var numberOfArtists = songInfo.artists.length;
+	console.log("\n-------------- Your Song Info ---------------------\n")
 
-		  console.log("Artist(s): ");
-		 for (i = 0; i < numberOfArtists; i++) {
-		 console.log(songInfo.artists[i].name);
-		}
-		 console.log("\nPreview URL: " + songInfo.preview_url);
-		 console.log("Title: " + myTitle);
-		 console.log("Album Name: " + songInfo.album.name);
-		});
+	  var numberOfArtists = songInfo.artists.length;
 
+	console.log("Artist(s): ");
+	
+	  for (i = 0; i < numberOfArtists; i++) {
+	  console.log(songInfo.artists[i].name);
+	  }
+	
+	console.log("\nPreview URL: " + songInfo.preview_url);
+	console.log("Title: " + myTitle);
+	console.log("Album Name: " + songInfo.album.name);
+	});
 };//end of spotIt function
 
 var tweeted = function() {
 
-	var client = new Twitter(keys);
+  var client = new Twitter(keys);
 	 
-	var params = {screen_name: 'TheFakeTalex'};
+  var params = {screen_name: 'TheFakeTalex'};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
 	  if (!error) {
 	    var myTweets = tweets.slice(0, 20);
@@ -100,8 +122,7 @@ var tweeted = function() {
 	  else {
 	  	console.log("error");
 	  }
-	});
-
+  });
 }; //end of tweeted function
 
 
